@@ -25,7 +25,7 @@ class ProfileViewSet(APIView):
         wishlist = CollectibleSerializer(profile.wishlist, many=True)
         trades = TradeSerializer(profile.trades, many=True)
         data = {
-            "url": serializer.data["bio"],
+            "bio": serializer.data["bio"],
             "username": serializer.data["username"],
             "profile_img": serializer.data["profile_img"],
             "rating": serializer.data["rating"],
