@@ -2,13 +2,15 @@
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react"
 import Header from "../components/header/header"
 import SignUp from "../components/SignUp"
+import Chat from "../components/Chat"
 
 function App() {
 
   return (
     <div>
       <SignedOut>
-        <SignUp />
+        {/* <SignUp /> */}
+        <Chat />
       </SignedOut>
       <SignedIn>
         <Header />
