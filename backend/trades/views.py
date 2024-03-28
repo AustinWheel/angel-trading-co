@@ -1,29 +1,11 @@
-from rest_framework import serializers
-from trades.models import Trade, Image
+from trades.models import Listing
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from profiles.models import Profile
-from collectibles.views import CollectibleSerializer
 from collectibles.models import Collectible
 from collections import defaultdict
-
-
-# Create your views here.
-class TradeSerializer(serializers.ModelSerializer):
-    trading = CollectibleSerializer(read_only=True)
-    requesting1 = CollectibleSerializer(read_only=True)
-    requesting2 = CollectibleSerializer(read_only=True)
-    requesting3 = CollectibleSerializer(read_only=True)
-    class Meta:
-        model = Trade
-        fields = ['trading', 'requesting1', 'requesting2', 'requesting3', 'price', 'description', 'images', 'id']
-
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = ['url', 'verified']
 
 class WishListRecommendations(APIView):
     permission_classes = [IsAuthenticated]
@@ -35,8 +17,8 @@ class WishListRecommendations(APIView):
 
         results = defaultdict(list)
         for collectible in collectibles:
-            trades = Trade.objects.filter(trading=collectible).exclude(id__in=profile.trades.all())
-            results[collectible.id].append(f"{len(trades)}, {collectible.image}")
+            listings = Listing.objects.filter(collectible=collectible).exclude(id__in=profile.collection.all())
+            results[collectible.id].append(f"{len(listings)}, {collectible.image}")
         return Response(results, status=status.HTTP_200_OK)
     
 class MFCRecommendations(APIView):
@@ -49,7 +31,7 @@ class MFCRecommendations(APIView):
 
         results = defaultdict(list)
         for collectible in collectibles:
-            trades = Trade.objects.filter(trading=collectible).exclude(id__in=profile.trades.all())
-            if trades: results[collectible.id].append(f"{len(trades)}, {collectible.image}")
+            listings = Listing.objects.filter(collectible=collectible).exclude(id__in=profile.collection.all())
+            if listings: results[collectible.id].append(f"{len(listings)}, {collectible.image}")
 
         return Response(results, status=status.HTTP_200_OK)

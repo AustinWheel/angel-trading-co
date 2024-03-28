@@ -19,6 +19,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { postTrade } from '../../api/profile';
 import {submitForVerificaiton, submitForVerification} from '../../api/verify';
+import { Switch } from '@mui/material';
 
 type Collectible = {
     id: string;
@@ -68,10 +69,9 @@ const NewTrade = () => {
     };
 
     
-    const [trading, setTrading] = React.useState<Collectible | null>(null);
-    const [requestingOne, setRequestingOne] = React.useState<Collectible | null>(null);
-    const [requestingTwo, setRequestingTwo] = React.useState<Collectible | null>(null);
-    const [requestingThree, setRequestingThree] = React.useState<Collectible | null>(null);
+    const [collectible, setCollectible] = React.useState<Collectible | null>(null);
+    const [available, setAvailable] = React.useState(false);
+
     const [description, setDescription] = React.useState<string>('');
     const [price, setPrice] = React.useState(0.0);
     
@@ -118,8 +118,8 @@ const NewTrade = () => {
     }
     
     React.useEffect(() => {
-        setDisabled(!(trading !== undefined && description !== '' && images.length !== 0 && verifying !== true && isUploading !== true));
-    }, [images, trading, description, verifying, isUploading]);
+        setDisabled(!(collectible !== undefined && description !== '' && images.length !== 0 && verifying !== true && isUploading !== true));
+    }, [images, collectible, description, verifying, isUploading]);
 
 
     React.useEffect(() => {
@@ -136,12 +136,10 @@ const NewTrade = () => {
         };
         setIsUploading(true);
         const form = {
-            trading: trading.id,
-            requesting1: requestingOne ? requestingOne.id : '',
-            requesting2: requestingTwo ? requestingTwo.id : '',
-            requesting3: requestingThree ? requestingThree.id : '',
-            description: description,
+            collectible: collectible.id,
+            available: available,
             price: price,
+            description: description,
             images: [],
             verifyImage: verifyImage !== undefined ? verifyImage.imagePreview : '',
         };
@@ -206,45 +204,23 @@ const NewTrade = () => {
                                 <div>
                                     <Autocomplete
                                         {...getOptions(data)}
-                                        value={trading}
+                                        value={collectible}
                                         onChange={(_: any, newValue: Collectible | null) => {
-                                            setTrading(newValue);
+                                            setCollectible(newValue);
                                         }}
                                         id="controllable-states-demo"
                                         sx={{ width: "100%", marginBottom: 2, }}
                                         renderInput={(params) => <TextField {...params} color="success" label="Select a Smiski to trade" />}
                                     />
-                                    <Autocomplete
-                                        {...getOptions(data)}
-                                        value={requestingOne}
-                                        onChange={(_: any, newValue: Collectible | null) => {
-                                            setRequestingOne(newValue);
-                                        }}
-                                        id="controllable-states-demo"
-                                        sx={{ width: "100%", marginBottom: 2 }}
-                                        renderInput={(params) => <TextField {...params} color="success" label="[Optional] Select a Smiski to receive" />}
+                                    <div style={{width: "100%", marginBottom: 15}}>
+                                    Make this collectible available for trading or selling?
+                                    <Switch
+                                        checked={available}
+                                        onChange={() => setAvailable(!available)}
+                                        name="Available"
                                         color="success"
                                     />
-                                    <Autocomplete
-                                        {...getOptions(data)}
-                                        value={requestingTwo}
-                                        onChange={(_: any, newValue: Collectible | null) => {
-                                            setRequestingTwo(newValue);
-                                        }}
-                                        id="controllable-states-demo"
-                                        sx={{ width: "100%", marginBottom: 2, color: 'success'}}
-                                        renderInput={(params) => <TextField {...params} color="success" label="[Optional] Select a Smiski to receive" />}
-                                        />
-                                        <Autocomplete
-                                        {...getOptions(data)}
-                                        value={requestingThree}
-                                        onChange={(_: any, newValue: Collectible | null) => {
-                                            setRequestingThree(newValue);
-                                        }}
-                                        id=""
-                                        sx={{ width: "100%", marginBottom: 2 }}
-                                        renderInput={(params) => <TextField color="success" {...params} label="[Optional] Select a Smiski to receive" />}
-                                    />
+                                    </div>
                                     <TextField 
                                         type="number" 
                                         min="0.0" 
